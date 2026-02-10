@@ -11,7 +11,7 @@ namespace Infrastructure.Data
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceDetail> InvoiceDetails { get; set; }
         public DbSet<Offer> Offers { get; set; }
-        public DbSet<PaymentMethod> PaymentMethodes { get; set; }
+        public DbSet<Payment> Payments { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<RoleFeature> RoleFeatures { get; set; }

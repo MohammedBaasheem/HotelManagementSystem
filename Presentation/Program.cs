@@ -5,7 +5,6 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Presentation.MiddleWares;
 using System.Diagnostics;
-
 using Domain.Models;
 using Infrastructure.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
