@@ -1,3 +1,11 @@
+using Application.Helpers;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Presentation.MiddleWares;
+using System.Diagnostics;
+
 using Domain.Models;
 using Infrastructure.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -6,10 +14,53 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// --------------------
+// Autofac
+// --------------------
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
+builder.Host.ConfigureContainer<ContainerBuilder>(container =>
+{
+    container.RegisterModule<ApplicationModule>();
+    container.RegisterModule<AutoMapperModule>();
+});
+
+// --------------------
+// Database connection selection
+// --------------------
+var authMode = builder.Configuration.GetValue<string>(
+    "Database:AuthMode",
+    "Windows"
+);
+
+string connectionString = authMode switch
+{
+    "Windows" => builder.Configuration.GetConnectionString("WindowsAuth")!,
+    "Sql" => builder.Configuration.GetConnectionString("SqlAuth")!,
+    _ => throw new InvalidOperationException(
+        $"Invalid Database:AuthMode '{authMode}'"
+    )
+};
+
+
+// --------------------
+// DbContext (MUST be before Build)
+// --------------------
+builder.Services.AddDbContext<Context>(options =>
+{
+    options.UseSqlServer(
+            connectionString,
+            b => b.MigrationsAssembly("Infrastructure")
+        )
+        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+        .LogTo(log => Debug.WriteLine(log), LogLevel.Information)
+        .EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
+});
+
+// --------------------
+// Other services
+// --------------------
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
@@ -33,16 +84,19 @@ builder.Services.AddAuthentication()
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseMiddleware<GlobalErrorHandlerMiddleware>();
+app.UseMiddleware<TransactionMiddleware>();
+
+// --------------------
+// Pipeline
+// --------------------
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 await app.Services.SeedAsync();

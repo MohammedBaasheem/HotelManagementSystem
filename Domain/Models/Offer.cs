@@ -12,5 +12,7 @@ namespace Domain.Models
         public DateTime StartDate { get; set; }
         public DateTime EndtDate { get; set; }
         public decimal DiscountValue { get; set; }
+
+        public HashSet<RoomOffer> RoomOffer { get; set; } = new HashSet<RoomOffer>();
     }
 }
