@@ -1,27 +1,26 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Application.Helpers;
+using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
 {
     public class Context: DbContext
     {
-        DbSet<Facility> Facilities { get; set; }
-        DbSet<Feature> Features { get; set; }
-        DbSet<Feedback> FeedBacks { get; set; }
-        DbSet<Invoice> Invoices { get; set; }
-        DbSet<InvoiceDetail> InvoiceDetails { get; set; }
-        DbSet<Offer> Offers { get; set; }
-        DbSet<PaymentMethod> PaymentMethodes { get; set; }
-        DbSet<Reservation> Reservations { get; set; }
-        DbSet<Role> Roles { get; set; }
-        DbSet<RoleFeature> RoleFeatures { get; set; }
-        DbSet<Room> Rooms { get; set; }
-        DbSet<RoomFacility> RoomFacilities { get; set; }
-        DbSet<RoomOffer> RoomOffers { get; set; }
-        DbSet<RoomReservation> RoomReservations { get; set; }
-        DbSet<User> Users { get; set; }
-        DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<Facility> Facilities { get; set; }
+        public DbSet<Feedback> FeedBacks { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<InvoiceDetail> InvoiceDetails { get; set; }
+        public DbSet<Offer> Offers { get; set; }
+        public DbSet<PaymentMethod> PaymentMethodes { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<RoleFeature> RoleFeatures { get; set; }
+        public DbSet<Room> Rooms { get; set; }
+        public DbSet<RoomFacility> RoomFacilities { get; set; }
+        public DbSet<RoomOffer> RoomOffers { get; set; }
+        public DbSet<RoomReservation> RoomReservations { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
+
     }
 }

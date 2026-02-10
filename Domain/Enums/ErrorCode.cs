@@ -8,20 +8,23 @@ namespace Domain.Enums
 
 
         ValidationError = 101,
+        InvalidCredentials = 102,
 
-        UserNameRequired = 102,
-        EmailRequired = 103,
-        InvalidEmailFormat = 104,
-        EmailAlreadyExists = 105,
-        EmailTooLong = 106,
+        UserNameRequired = 110,
+        EmailRequired = 111,
+        InvalidEmailFormat = 112,
+        EmailAlreadyExists = 113,
+        EmailTooLong = 114,
 
-        PasswordRequired = 107,
-        PasswordTooLong = 108,
-        PasswordTooShort = 109,
-        PasswordMismatch = 110,
-        ConfirmPasswordRequired = 111,
+        PasswordRequired = 120,
+        PasswordTooLong = 121,
+        PasswordTooShort = 122,
+        PasswordMismatch = 123,
+        ConfirmPasswordRequired = 124,
 
-        PhoneNumberRequired = 112,
-        CountryRequired = 113
+        PhoneNumberRequired = 130,
+        CountryRequired = 131
+
+
     }
 }
