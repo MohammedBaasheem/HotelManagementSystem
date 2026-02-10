@@ -10,7 +10,7 @@ namespace Domain.Models
         public int RoomReservationId { get; set; }   // FK
                                                      // public RoomReservation RoomReservation { get; set; }
 
-        public enum PaymentMethod { get; set; }     // FK
+        public PaymentMethod PaymentMethod { get; set; }    
 
 
         public decimal Amount { get; set; }
@@ -21,6 +21,7 @@ namespace Domain.Models
 
         public bool IsCompleted { get; set; }
 
+        public Guid InvoiceId { get; set; }
         public Invoice Invoice { get; set; }
 
 
