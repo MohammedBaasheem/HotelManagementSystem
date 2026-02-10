@@ -1,3 +1,4 @@
+using Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,13 @@ namespace Domain.Models
         public decimal PricePerNight { get; set; }
         public string? RoomDescription { get; set; }
 
-        public Guid RoomTypeId { get; set; }
+        public RoomTypes RoomType { get; set; }
+
+        public Guid UserId { get; set; }
+        public User User { get; set; }
 
         public HashSet<RoomFacility> RoomFacilities { get; set; } = new HashSet<RoomFacility>();
+        public HashSet<RoomOffer> RoomOffer { get; set; } = new HashSet<RoomOffer>();
 
 
     }
