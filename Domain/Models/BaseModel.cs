@@ -7,7 +7,7 @@ namespace Domain.Models
 {
     public class BaseModel
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public bool IsDeleted { get; set; } = false;
         public bool IsActive { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.Now;

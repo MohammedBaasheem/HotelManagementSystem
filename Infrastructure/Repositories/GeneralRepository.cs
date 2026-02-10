@@ -2,18 +2,14 @@ using Application.IRepositories;
 using Domain.Models;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
     public class GeneralRepository<T> : IGeneralRepository<T> where T : BaseModel
     {
-        private readonly Context _context;
-        private readonly DbSet<T> _dbset;
+        protected readonly Context _context;
+        protected readonly DbSet<T> _dbset;
 
         public GeneralRepository(Context context)
         {
@@ -24,6 +20,11 @@ namespace Infrastructure.Repositories
         public bool Add(T entity)
         {
             _dbset.Add(entity);
+            return true;
+        }
+        public async Task<bool> AddAsync(T entity)
+        {
+            await _dbset.AddAsync(entity);
             return true;
         }
 
@@ -61,7 +62,6 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
-
         public void HardDelete(Guid id)
         {
             _dbset
@@ -83,6 +83,7 @@ namespace Infrastructure.Repositories
         {
             return _dbset.Any(x => x.Id == id);
         }
+        public async Task<bool> IsExistAsync(Expression<Func<T, bool>> predicate) => await _dbset.Where(e => !e.IsDeleted).AnyAsync(predicate);
 
         public async Task<IEnumerable<TResult>> GetFilter<TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, TResult>> selector)
         {
