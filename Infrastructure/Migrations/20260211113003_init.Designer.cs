@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20260211102229_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260211113003_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -141,9 +141,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("IssueDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("PaymentId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -230,7 +227,7 @@ namespace Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("EndtDate")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
@@ -302,8 +299,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvoiceId")
-                        .IsUnique();
+                    b.HasIndex("InvoiceId");
 
                     b.ToTable("Payments");
                 });
@@ -616,8 +612,8 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("numberOfNights")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<short>("numberOfNights")
+                        .HasColumnType("smallint");
 
                     b.Property<decimal>("pricePerNight")
                         .HasPrecision(18, 2)
@@ -755,8 +751,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Models.Payment", b =>
                 {
                     b.HasOne("Domain.Models.Invoice", "Invoice")
-                        .WithOne("Payment")
-                        .HasForeignKey("Domain.Models.Payment", "InvoiceId")
+                        .WithMany()
+                        .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -899,12 +895,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Models.Facility", b =>
                 {
                     b.Navigation("RoomFacilities");
-                });
-
-            modelBuilder.Entity("Domain.Models.Invoice", b =>
-                {
-                    b.Navigation("Payment")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Models.Offer", b =>

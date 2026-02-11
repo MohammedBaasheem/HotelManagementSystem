@@ -1,4 +1,4 @@
-﻿namespace Application.DTOs.AuthDTOs
+﻿namespace Application.DTOs.UserDTOs
 {
     public class UserWithRolesDto
     {
@@ -6,5 +6,6 @@
         public string UserName { get; set; }
         public string PasswordHash { get; set; }
         public IEnumerable<Guid> RoleIds { get; set; }
+
     }
 }

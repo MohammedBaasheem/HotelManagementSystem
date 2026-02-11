@@ -23,7 +23,11 @@ namespace Domain.Enums
         ConfirmPasswordRequired = 124,
 
         PhoneNumberRequired = 130,
-        CountryRequired = 131
+        CountryRequired = 131,
+
+        RoleNotFound = 140,
+        RoleAlreadyExists = 141,
+        UserNotFound = 142,
 
 
     }
