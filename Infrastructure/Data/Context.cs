@@ -6,6 +6,10 @@ namespace Infrastructure.Data
 {
     public class Context: DbContext
     {
+        public Context(DbContextOptions<Context> options)
+        : base(options)
+        {
+        }
         public DbSet<Facility> Facilities { get; set; }
         public DbSet<Feedback> FeedBacks { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
@@ -21,6 +25,20 @@ namespace Infrastructure.Data
         public DbSet<RoomReservation> RoomReservations { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(Context).Assembly);
+        }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            configurationBuilder
+                .Properties<decimal>()
+                .HavePrecision(18, 2);
+        }
 
     }
 }
