@@ -14,7 +14,7 @@ namespace Domain.Models
         public bool IsRecommended { get; set; }
 
         public int Rate { get; set; }
-        public int RoomReservationId { get; set; }   // FK
+        public Guid RoomReservationId { get; set; }   
         public RoomReservation RoomReservation { get; set; }
 
 
