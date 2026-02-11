@@ -1,5 +1,7 @@
 using Application.DTOs.AuthDTOs;
 using Application.DTOs.ResponseDTOs;
+using Application.DTOs.RoleDTOs;
+using Application.DTOs.UserDTOs;
 using Application.Helpers;
 using Application.Interface;
 using Application.IRepositories;
@@ -41,9 +43,9 @@ namespace Application.Services
                 return ResponseDto<bool>.Fail(ErrorCode.ValidationError, "Validation Error", errors);
             }
             var Exist = await _UserRepo.IsExistAsync(u => u.Email.ToLower() == RequestDTO.Email.ToLower());
+
             if (Exist)
                 return ResponseDto<bool>.Fail(ErrorCode.EmailAlreadyExists, "Email Already Exist");
-
 
             var user = _mapper.Map<User>(RequestDTO);
 
@@ -51,12 +53,11 @@ namespace Application.Services
             user.PasswordHash = PasswordHasher.HashPassword(RequestDTO.Password);
 
             await _UserRepo.AddAsync(user);
-           
+
             await AssignRoleToUserAsync(user.Id, Roles.CUSTOMER.ToString());
 
             await _UserRepo.SaveChanges();
             return ResponseDto<bool>.Success(true, "Registered successfully");
-
         }
 
         public async Task<ResponseDto<LoginResponseDto>> LoginAsync(LoginDto RequestDTO)
@@ -113,9 +114,11 @@ namespace Application.Services
             return tokenString;
         }
 
-        public async Task AssignRoleToUserAsync (Guid userId, string roleName)
+        public async Task<ResponseDto<bool>> AssignRoleToUserAsync (Guid userId, string roleName)
         {
             var roleId = await _RoleRepo.GetRoleIdByNameAsync(roleName);
+            if (roleId == Guid.Empty)
+                return ResponseDto<bool>.Fail(ErrorCode.RoleNotFound, $"Role: '{roleName}' Not Found");
 
             var userRole = new UserRole
             {
@@ -124,8 +127,19 @@ namespace Application.Services
                 CreatedAt = DateTime.UtcNow,
             };
             await _UserRepo.AddUserRoleAsync(userRole);
+            return ResponseDto<bool>.Success(true);
         }
 
+        public async Task<ResponseDto<UserDto>> GetUserProfileAsync(Guid userId)
+        {
+            var user = await _UserRepo.GetAll().Where(u => u.Id == userId)
+                .ProjectTo<UserDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync();
+
+            if (user == null)
+                return ResponseDto<UserDto>.Fail(ErrorCode.UserNotFound, "User Not Found");
+
+            return ResponseDto<UserDto>.Success(user);
+        }
 
     }
 

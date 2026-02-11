@@ -6,10 +6,9 @@ namespace Infrastructure.Data
 {
     public class Context: DbContext
     {
-        public Context(DbContextOptions<Context> options)
-        : base(options)
-        {
-        }
+        public Context(DbContextOptions<Context> options): base(options) { }
+
+
         public DbSet<Facility> Facilities { get; set; }
         public DbSet<Feedback> FeedBacks { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
