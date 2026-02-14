@@ -17,6 +17,8 @@ using Presentation.MiddleWares;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
+using Presentation.Helpers;
+using Infrastructure.Seeds;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,9 +31,8 @@ builder.Host.ConfigureContainer<ContainerBuilder>(container =>
 {
     container.RegisterModule<ApplicationModule>();
     container.RegisterModule<AutoMapperModule>();
-
-    container.RegisterType<GlobalErrorHandlerMiddleware>().InstancePerDependency();
-    container.RegisterType<TransactionMiddleware>().InstancePerDependency();
+    // Create a WebModule in your API project for the Middlewares
+    container.RegisterModule<PresentationModule>();
 });
 
 // --------------------
@@ -72,17 +73,6 @@ builder.Services.AddDbContext<Context>(options =>
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-
-//////////////////////////////
-builder.Services.AddInfrastructureServices();
-builder.Services.AddApplicationServices();
-
-builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
-builder.Services.AddScoped<TransactionMiddleware>();
-
-
-//////////////////////////////////////////
 var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 
@@ -105,7 +95,7 @@ var app = builder.Build();
 
 app.UseMiddleware<GlobalErrorHandlerMiddleware>();
 app.UseMiddleware<TransactionMiddleware>();
-
+app.UseMiddleware<RequestTimeoutMiddleware>();
 // --------------------
 // Pipeline
 // --------------------
@@ -115,12 +105,35 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-await app.Services.SeedAsync();
+// await app.Services.SeedAsync();
 
+// Create a scope to resolve the DbContext
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<Context>();
+        
+        // Apply migrations automatically (Optional but helpful)
+        await context.Database.MigrateAsync();
+        
+        // Run your Seed
+        await ContextSeed.SeedAsync(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred during database seeding.");
+    }
+}
+
+// ... rest of your middleware (UseRouting, UseAuthentication, etc.)
 app.Run();
+
+
