@@ -8,6 +8,8 @@ namespace Application.DTOs.RoleDTOs
         public RoleProfile()
         {
             CreateMap<Role, GetRoleDto>();
+            CreateMap<CreateRoleDto, Role>();
+
         }
     }
 }

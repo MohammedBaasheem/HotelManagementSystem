@@ -28,6 +28,9 @@ namespace Domain.Enums
         RoleNotFound = 140,
         RoleAlreadyExists = 141,
         UserNotFound = 142,
+        DuplicateEntry = 143,
+        RoleFeatureNotFound = 144,
+        UserRoleNotFound = 145,
 
 
     }

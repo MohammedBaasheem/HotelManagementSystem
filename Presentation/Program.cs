@@ -1,27 +1,37 @@
 using Application.Helpers;
+using Application.Interface;
+using Application.IRepositories;
+using Application.Services;
 using Autofac;
+using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
+using Domain.Models;
+using FluentValidation;
 using Infrastructure.Data;
+using Infrastructure.Helpers;
+using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Presentation.MiddleWares;
 using System.Diagnostics;
-using Domain.Models;
-using Infrastructure.Helpers;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --------------------
-// Autofac
-// --------------------
+ //--------------------
+ //Autofac
+ //--------------------
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
 builder.Host.ConfigureContainer<ContainerBuilder>(container =>
 {
     container.RegisterModule<ApplicationModule>();
     container.RegisterModule<AutoMapperModule>();
+
+    container.RegisterType<GlobalErrorHandlerMiddleware>().InstancePerDependency();
+    container.RegisterType<TransactionMiddleware>().InstancePerDependency();
 });
 
 // --------------------
@@ -62,6 +72,17 @@ builder.Services.AddDbContext<Context>(options =>
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+
+//////////////////////////////
+builder.Services.AddInfrastructureServices();
+builder.Services.AddApplicationServices();
+
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
+builder.Services.AddScoped<TransactionMiddleware>();
+
+
+//////////////////////////////////////////
 var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 
@@ -80,7 +101,6 @@ builder.Services.AddAuthentication()
         };
     });
 
-
 var app = builder.Build();
 
 app.UseMiddleware<GlobalErrorHandlerMiddleware>();
@@ -95,7 +115,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 await app.Services.SeedAsync();

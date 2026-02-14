@@ -8,9 +8,9 @@ namespace Application.DTOs.UserDTOs
         public UserProfile()
         {
             CreateMap<User, UserDto>()
-                .ForMember(d => d.Roles, opt => opt.MapFrom(s => s.UserRole.Select(ur => ur.Role.Name)));
+                .ForMember(d => d.Roles, opt => opt.MapFrom(s => s.UserRole.Where(ur => !ur.IsDeleted && !ur.Role.IsDeleted).Select(ur => ur.Role.Name)));
             CreateMap<User, UserWithRolesDto>()
-                .ForMember(d => d.RoleIds, opt => opt.MapFrom(s => s.UserRole.Select(ur => ur.RoleId)));
+                .ForMember(d => d.RoleIds, opt => opt.MapFrom(s => s.UserRole.Where(ur => !ur.IsDeleted && !ur.Role.IsDeleted).Select(ur => ur.RoleId)));
 
             CreateMap<UpdateUserDto, User>();
 
