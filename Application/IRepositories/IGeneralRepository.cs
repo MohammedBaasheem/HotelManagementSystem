@@ -22,5 +22,6 @@ namespace Application.IRepositories
         Task SaveChanges();
         bool Exists(Guid id);
         public Task<bool> IsExistAsync(Expression<Func<T, bool>> predicate);
+        Task<IEnumerable<TResult>> GetFilter<TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, TResult>> selector);
     }
 }
