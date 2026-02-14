@@ -23,5 +23,7 @@ namespace Domain.Models
 
         public Guid InvoiceId { get; set; }
         public Invoice Invoice { get; set; }
+
+        public HashSet<RoomReservation> RoomReservations { get; set; }
     }
 }
