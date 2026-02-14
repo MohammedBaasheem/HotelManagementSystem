@@ -1,4 +1,5 @@
-﻿using Domain.Enums;
+﻿using Azure;
+using Domain.Enums;
 using Presentation.ViewModels.ValidationVMs;
 
 namespace Presentation.ViewModels.ResponseVMs;
@@ -10,7 +11,11 @@ public class ResponseVM<T>
     public ErrorCode errorCode { get; set; }
     public string Message { get; set; }
 
+        
     public IEnumerable<ValidationErrorVM>? Errors { get; set; } 
+
+       
+
     public static ResponseVM<T> Success(T data, string message = "Completed Successfully")
     {
         return new ResponseVM<T>

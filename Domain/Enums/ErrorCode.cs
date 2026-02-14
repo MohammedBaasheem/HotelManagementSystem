@@ -32,6 +32,21 @@ namespace Domain.Enums
         RoleFeatureNotFound = 144,
         UserRoleNotFound = 145,
 
+        // Offer related errors
+        OfferCodeAlreadyExists = 301,
+        OfferDescriptionRequired = 302,
+        OfferStartDateRequired = 303,
+        OfferEndDateRequired = 304,
+        OfferInvalidEndDate = 305,
+        OfferInvalidDiscountValue = 306,
+        OfferNotFound=307,
 
+
+        // Room related errors
+        RoomNotFound = 600,              
+        RoomNumberAlreadyExists = 601,   
+        RoomTypeRequired = 602,          
+        RoomPriceInvalid = 603,          
+        RoomCapacityInvalid = 604
     }
 }
