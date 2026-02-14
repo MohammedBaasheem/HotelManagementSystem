@@ -29,11 +29,14 @@ namespace Infrastructure.Seeds
                     UserName = "admin",
                     Email = "admin@hotel.com",
                     PhoneNumber = "",
+                    Country = "",
                     PasswordHash = PasswordHasher.HashPassword("admin123"),
                     CreatedAt = DateTime.UtcNow
                 };
 
                 await context.Users.AddAsync(adminUser);
+                await context.SaveChangesAsync();
+
 
                 var adminRole = context.Roles.FirstOrDefault(r => r.Name == Roles.ADMIN.ToString());
 
