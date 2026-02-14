@@ -852,7 +852,7 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Models.Reservation", "Reservation")
-                        .WithMany()
+                        .WithMany("RoomReservations")
                         .HasForeignKey("ReservationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -897,6 +897,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Models.Offer", b =>
                 {
                     b.Navigation("RoomOffer");
+                });
+
+            modelBuilder.Entity("Domain.Models.Reservation", b =>
+                {
+                    b.Navigation("RoomReservations");
                 });
 
             modelBuilder.Entity("Domain.Models.Role", b =>

@@ -18,17 +18,20 @@ using System.Text;
 
 namespace Application.Services
 {
-    public class UserManagmentService
+    public class UserManagmentService : IUserManagementService
     {
         protected readonly IUserRepository _UserRepo;
         protected readonly IRoleRepository _RoleRepo;
+        protected readonly IGeneralRepository<UserRole> _UserRoleRepo;
         protected readonly IValidationService _ValidationService;
         protected readonly IMapper _mapper;
         private readonly JwtOptions _jwtOptions;
-        public UserManagmentService(IUserRepository UserRepo, IRoleRepository RoleRepo, IValidationService ValidationService, IMapper mapper, IOptions<JwtOptions> jwtOptions)
+
+        public UserManagmentService(IUserRepository UserRepo, IRoleRepository RoleRepo, IGeneralRepository<UserRole> userRoleRepo,IValidationService ValidationService, IMapper mapper, IOptions<JwtOptions> jwtOptions)
         {
             _UserRepo = UserRepo;
             _RoleRepo = RoleRepo;
+            _UserRoleRepo = userRoleRepo;
             _ValidationService = ValidationService;
             _mapper = mapper;
             _jwtOptions = jwtOptions.Value;
@@ -42,20 +45,26 @@ namespace Application.Services
             {
                 return ResponseDto<bool>.Fail(ErrorCode.ValidationError, "Validation Error", errors);
             }
-            var Exist = await _UserRepo.IsExistAsync(u => u.Email.ToLower() == RequestDTO.Email.ToLower());
+            var Exist = await _UserRepo.IsExistAsync(u => u.Email == RequestDTO.Email.ToLower());
 
             if (Exist)
                 return ResponseDto<bool>.Fail(ErrorCode.EmailAlreadyExists, "Email Already Exist");
 
             var user = _mapper.Map<User>(RequestDTO);
-
-            user.Email = RequestDTO.Email.Trim().ToLower();
             user.PasswordHash = PasswordHasher.HashPassword(RequestDTO.Password);
 
             await _UserRepo.AddAsync(user);
 
-            await AssignRoleToUserAsync(user.Id, Roles.CUSTOMER.ToString());
+            var roleId = await _RoleRepo.GetRoleIdByNameAsync(Roles.CUSTOMER.ToString());
 
+            var userRole = new UserRole
+            {
+                UserId = user.Id,
+                RoleId = roleId,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            await _UserRepo.AddUserRoleAsync(userRole);
             await _UserRepo.SaveChanges();
             return ResponseDto<bool>.Success(true, "Registered successfully");
         }
@@ -114,19 +123,58 @@ namespace Application.Services
             return tokenString;
         }
 
-        public async Task<ResponseDto<bool>> AssignRoleToUserAsync (Guid userId, string roleName)
+        public async Task<ResponseDto<bool>> AssignRoleToUserAsync (Guid userId, Guid roleId, Guid actionBy)
         {
-            var roleId = await _RoleRepo.GetRoleIdByNameAsync(roleName);
-            if (roleId == Guid.Empty)
-                return ResponseDto<bool>.Fail(ErrorCode.RoleNotFound, $"Role: '{roleName}' Not Found");
+            var userExist = await _UserRepo.IsExistAsync(x => x.Id == userId);
+            if(!userExist)
+                return ResponseDto<bool>.Fail(ErrorCode.UserNotFound, "User Not Found");
+
+            var roleExist = await _RoleRepo.IsExistAsync (x => x.Id == roleId);
+            if(!roleExist)
+                return ResponseDto<bool>.Fail(ErrorCode.RoleNotFound, "Role Not Found");
+
+            var roleUserExist = await _UserRepo.IsUserInRoleAsync(userId, roleId);
+            if(roleUserExist)
+                return ResponseDto<bool>.Fail(ErrorCode.DuplicateEntry, "User already has this role");
 
             var userRole = new UserRole
             {
                 UserId = userId,
                 RoleId = roleId,
                 CreatedAt = DateTime.UtcNow,
+                CreatedBy = actionBy
             };
-            await _UserRepo.AddUserRoleAsync(userRole);
+            await _UserRoleRepo.AddAsync(userRole);
+
+            await _UserRoleRepo.SaveChanges();
+            return ResponseDto<bool>.Success(true);
+        }
+
+        public async Task<ResponseDto<bool>> UnassignRoleFromUserAsync(Guid userId, Guid roleId, Guid actionBy)
+        {
+            var roleUser = await _UserRoleRepo.GetWithTracking(x => x.RoleId == roleId && x.UserId == userId);
+            if (roleUser == null)
+                return ResponseDto<bool>.Fail(ErrorCode.UserRoleNotFound, "This role is not assigned to this user");
+
+            roleUser.IsDeleted = true;
+            roleUser.UpdatedAt = DateTime.UtcNow;
+            roleUser.UpdatedBy = actionBy;
+
+            await _UserRoleRepo.SaveChanges();
+            return ResponseDto<bool>.Success(true);
+        }
+
+        public async Task<ResponseDto<bool>> DeleteUser(Guid userId, Guid actionBy)
+        {
+            var user = await _UserRepo.GetWithTracking(x => x.Id == userId);
+            if (user == null)
+                return ResponseDto<bool>.Fail(ErrorCode.UserNotFound, "User Not Found");
+
+            user.IsDeleted = true;
+            user.UpdatedAt = DateTime.UtcNow;
+            user.UpdatedBy = actionBy;
+
+            await _UserRepo.SaveChanges();
             return ResponseDto<bool>.Success(true);
         }
 
@@ -139,6 +187,33 @@ namespace Application.Services
                 return ResponseDto<UserDto>.Fail(ErrorCode.UserNotFound, "User Not Found");
 
             return ResponseDto<UserDto>.Success(user);
+        }
+
+        public async Task<ResponseDto<bool>> CreateStaffUserAsync(CreateStaffUserDto RequestDTO, Guid actionBy)
+        {
+            var errors = await _ValidationService.ValidateAsync(RequestDTO);
+            if (errors.Any())
+            {
+                return ResponseDto<bool>.Fail(ErrorCode.ValidationError, "Validation Error", errors);
+            }
+
+            var user = _mapper.Map<User>(RequestDTO);
+            user.PasswordHash = PasswordHasher.HashPassword(RequestDTO.Password);
+            user.CreatedBy = actionBy;
+
+            await _UserRepo.AddAsync(user);
+
+            var userRole = new UserRole
+            {
+                UserId = user.Id,
+                RoleId = RequestDTO.RoleId,
+                CreatedBy = actionBy
+            };
+
+            await _UserRepo.AddUserRoleAsync(userRole);
+
+            await _UserRepo.SaveChanges();
+            return ResponseDto<bool>.Success(true, "Staff user created successfully");
         }
 
     }
