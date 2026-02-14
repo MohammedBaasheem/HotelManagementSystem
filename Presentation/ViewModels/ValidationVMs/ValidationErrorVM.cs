@@ -1,8 +1,8 @@
-﻿namespace Presentation.ViewModels.ValidationVMs
+﻿namespace Presentation.ViewModels.ValidationVMs;
+
+public class ValidationErrorVM
 {
-    public class ValidationErrorVM
-    {
-        public string Message { get; set; }
-        public int Code { get; set; }
-    }
+    public string Message { get; set; }
+    public int Code { get; set; }
+}
 }

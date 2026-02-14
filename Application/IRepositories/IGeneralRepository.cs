@@ -18,6 +18,7 @@ namespace Application.IRepositories
         Task<bool> AddAsync(T entity);
         void Update(T entity);
         void SoftDelete(T entity);
+        public Task SoftDeleteAsync(Guid id);
         void HardDelete(Guid id);
         Task SaveChanges();
         bool Exists(Guid id);

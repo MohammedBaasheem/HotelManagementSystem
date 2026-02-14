@@ -14,7 +14,8 @@ namespace Infrastructure.Seeds
                 var roles = new List<Role>
             {
                 new Role { Name = Roles.ADMIN.ToString(), CreatedAt = DateTime.UtcNow }, 
-                new Role { Name = Roles.CUSTOMER.ToString(), CreatedAt = DateTime.UtcNow }
+                new Role { Name = Roles.CUSTOMER.ToString(), CreatedAt = DateTime.UtcNow },
+                new Role { Name = Roles.GUEST.ToString(), CreatedAt = DateTime.UtcNow}
             };
 
                 await context.Roles.AddRangeAsync(roles);
@@ -30,10 +31,12 @@ namespace Infrastructure.Seeds
                     Email = "admin@hotel.com",
                     PhoneNumber = "",
                     PasswordHash = PasswordHasher.HashPassword("admin123"),
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    Country = ""
                 };
 
                 await context.Users.AddAsync(adminUser);
+                await context.SaveChangesAsync();
 
                 var adminRole = context.Roles.FirstOrDefault(r => r.Name == Roles.ADMIN.ToString());
 
