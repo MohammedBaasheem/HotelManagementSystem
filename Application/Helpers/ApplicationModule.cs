@@ -20,7 +20,7 @@ namespace Application.Helpers
                    .InstancePerLifetimeScope();
 
             builder.RegisterType<RoomManagmentService>()
-                   .AsSelf()
+                   .As<IRoomManagmentService>()
                    .InstancePerLifetimeScope();
 
             builder.RegisterType<UserManagmentService>()
