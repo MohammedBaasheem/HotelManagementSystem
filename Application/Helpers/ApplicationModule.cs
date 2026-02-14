@@ -24,7 +24,15 @@ namespace Application.Helpers
                    .InstancePerLifetimeScope();
 
             builder.RegisterType<UserManagmentService>()
-                   .AsSelf()
+                   .As<IUserManagementService>()
+                   .InstancePerLifetimeScope();
+
+            builder.RegisterType<ValidationService>()
+                   .As<IValidationService>()
+                   .InstancePerLifetimeScope();
+
+            builder.RegisterType<RoleService>()
+                   .As<IRoleService>()
                    .InstancePerLifetimeScope();
 
             builder.RegisterType<PaymentService>()

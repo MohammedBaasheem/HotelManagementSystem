@@ -1,10 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Application.IRepositories;
+using Autofac;
+using Infrastructure.Repositories;
 
 namespace Infrastructure.Helpers
 {
-    internal class InfrastructureModule
+    public class InfrastructureModule : Module
     {
+        protected override void Load(ContainerBuilder builder)
+        {
+            // 1. Register Generic Repository
+            builder.RegisterGeneric(typeof(GeneralRepository<>))
+                   .As(typeof(IGeneralRepository<>))
+                   .InstancePerLifetimeScope();
+
+            builder.RegisterType<RoleRepository>()
+                   .As<IRoleRepository>()
+                   .InstancePerLifetimeScope();
+
+            builder.RegisterType<UserRepository>()
+                   .As<IUserRepository>()
+                   .InstancePerLifetimeScope();
+
+            // 2. Register UnitOfWork (if you use it)
+            // builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
+        }
     }
 }

@@ -1,24 +1,17 @@
 using Application.Helpers;
-using Application.Interface;
-using Application.IRepositories;
-using Application.Services;
 using Autofac;
-using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Domain.Models;
-using FluentValidation;
 using Infrastructure.Data;
 using Infrastructure.Helpers;
-using Infrastructure.Repositories;
+using Infrastructure.Seeds;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Presentation.Helpers;
 using Presentation.MiddleWares;
 using System.Diagnostics;
-using System.Reflection;
 using System.Text;
-using Presentation.Helpers;
-using Infrastructure.Seeds;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,9 +23,12 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(container =>
 {
     container.RegisterModule<ApplicationModule>();
-    container.RegisterModule<AutoMapperModule>();
-    // Create a WebModule in your API project for the Middlewares
+    container.RegisterModule(new Application.Helpers.AutoMapperModule(new[]
+    {
+        typeof(Program).Assembly
+    }));    
     container.RegisterModule<PresentationModule>();
+    container.RegisterModule<InfrastructureModule>();
 });
 
 // --------------------
@@ -91,6 +87,9 @@ builder.Services.AddAuthentication()
         };
     });
 
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 var app = builder.Build();
 
 app.UseMiddleware<GlobalErrorHandlerMiddleware>();
@@ -125,6 +124,8 @@ using (var scope = app.Services.CreateScope())
         
         // Run your Seed
         await ContextSeed.SeedAsync(context);
+        var mapper = services.GetRequiredService<AutoMapper.IMapper>();
+        Application.Helpers.MapperHelper.Mapper = mapper;
     }
     catch (Exception ex)
     {

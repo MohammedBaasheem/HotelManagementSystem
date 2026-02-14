@@ -47,6 +47,7 @@ namespace Presentation.controllers
         public async Task<ResponseVM<LoginResponseVM>> Login([FromBody] LoginVM model)
         {
             var dto = _mapper.Map<LoginDto>(model);
+
             var resultDto = await _userService.LoginAsync(dto);
             var VM = _mapper.Map<ResponseVM<LoginResponseVM>>(resultDto);
             return VM;
