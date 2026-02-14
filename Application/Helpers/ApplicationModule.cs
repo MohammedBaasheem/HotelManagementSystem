@@ -1,4 +1,5 @@
-﻿using Application.Services;
+﻿using Application.Interface;
+using Application.Services;
 using Autofac;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,15 @@ namespace Application.Helpers
                    .InstancePerLifetimeScope();
 
             builder.RegisterType<UserManagmentService>()
-                   .AsSelf()
+                   .As<IUserManagementService>()
+                   .InstancePerLifetimeScope();
+
+            builder.RegisterType<ValidationService>()
+                   .As<IValidationService>()
+                   .InstancePerLifetimeScope();
+
+            builder.RegisterType<RoleService>()
+                   .As<IRoleService>()
                    .InstancePerLifetimeScope();
 
             builder.RegisterType<PaymentService>()

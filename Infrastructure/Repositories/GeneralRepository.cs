@@ -33,6 +33,11 @@ namespace Infrastructure.Repositories
             entity.IsDeleted = true;
             Update(entity);
         }
+        public async Task SoftDeleteAsync(Guid id)
+        {
+            await _dbset.Where(x => x.Id == id)
+                .ExecuteUpdateAsync(x => x.SetProperty(e => e.IsDeleted, true));
+        }
 
         public async Task<T?> Get(Expression<Func<T, bool>> expression)
         {

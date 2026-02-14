@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 using Application.DTOs.ResrvationDTOs;
 using Application.Helpers;
 using Application.Services;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Attributes;
 using Presentation.ViewModels.ReservationsViewModels;
 
 namespace Presentation.Controllers
 {
-    // [Authorize] // Requires JWT
+    [Authorize] // Requires JWT
     [ApiController]
     [Route("api/[controller]")]
     public class ReservationsController(ReservationManagmentService reservationService) : ControllerBase
@@ -21,6 +23,7 @@ namespace Presentation.Controllers
         private Guid CurrentUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
         [HttpGet]
+        //[HasPermission(Feature.GetAllReservation)]
         public async Task<IActionResult> GetAll()
         {
             // 1. Get DTOs from Service
