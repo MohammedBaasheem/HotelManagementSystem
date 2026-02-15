@@ -8,7 +8,7 @@ namespace Application.Interface
     {
         Task<ResponseDto<bool>> RegisterAsync(RegisterDto requestDto);
         Task<ResponseDto<LoginResponseDto>> LoginAsync(LoginDto requestDto);
-        Task<ResponseDto<bool>> AssignRoleToUserAsync(Guid userId, Guid roleId, Guid actionBy);
+        Task<ResponseDto<bool>> AssignRoleToUserAsync(AssignRoleDto Dto, Guid actionBy);
         Task<ResponseDto<bool>> UnassignRoleFromUserAsync(Guid userId, Guid roleId, Guid actionBy);
         Task<ResponseDto<bool>> DeleteUser(Guid userId, Guid actionBy);
         Task<ResponseDto<UserDto>> GetUserProfileAsync(Guid userId);

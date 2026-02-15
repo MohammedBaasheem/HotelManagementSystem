@@ -31,6 +31,8 @@ namespace Domain.Enums
         DuplicateEntry = 143,
         RoleFeatureNotFound = 144,
         UserRoleNotFound = 145,
+        RoleRequired = 146,
+        UserRequired = 147,
 
         // Offer related errors
         OfferCodeAlreadyExists = 301,
