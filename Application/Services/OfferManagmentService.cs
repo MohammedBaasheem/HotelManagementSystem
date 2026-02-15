@@ -17,13 +17,13 @@ namespace Application.Services
     public class OfferManagmentService
     {
         protected readonly IOfferManagmentRepository _offerRepo;
-        protected readonly IRoomManagmentRepository _roomRepo;
+        protected readonly IGeneralRepository<Room> _roomRepo;
         protected readonly IValidationService _validationService;
         protected readonly IMapper _mapper;
 
         public OfferManagmentService(
             IOfferManagmentRepository offerRepo,
-            IRoomManagmentRepository roomRepo,
+            IGeneralRepository<Room> roomRepo,
             IValidationService validationService,
             IMapper mapper)
         {

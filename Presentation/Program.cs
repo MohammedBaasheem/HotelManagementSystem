@@ -69,6 +69,7 @@ builder.Services.AddDbContext<Context>(options =>
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+
 var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 
