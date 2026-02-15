@@ -17,6 +17,15 @@ namespace Infrastructure.Helpers
                    .As<IRoleRepository>()
                    .InstancePerLifetimeScope();
 
+            builder.RegisterType<OfferManagmentRepository>()
+                   .As<IOfferManagmentRepository>()
+                   .InstancePerLifetimeScope();
+            //IRoomManagmentRepository
+
+            //builder.RegisterType<RoomManagmentRepository>()
+            //       .As<IRoomManagmentRepository>()
+            //       .InstancePerLifetimeScope();
+
             builder.RegisterType<UserRepository>()
                    .As<IUserRepository>()
                    .InstancePerLifetimeScope();

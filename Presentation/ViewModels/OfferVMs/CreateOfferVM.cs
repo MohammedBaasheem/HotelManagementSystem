@@ -8,5 +8,6 @@
         public decimal DiscountValue { get; set; }
 
         public List<Guid> RoomIds { get; set; }
+
     }
 }
