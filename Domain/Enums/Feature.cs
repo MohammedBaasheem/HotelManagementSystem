@@ -30,7 +30,19 @@
         DeleteUser = 300,
         AssignRoleToUser = 301,
         UnassignRoleFromUser = 302,
-        CreateStaffUser = 303
+        CreateStaffUser = 303,
+
+
+        // =========================
+        // Offer Management (600 - 699)
+        // =========================
+        CreateOffer = 600,
+        UpdateOffer=601,
+        DeleteOffer = 602,
+        GetOfferById = 603,
+        GetAllOffers = 604,
+        GetFilteredOffers=605,
+
 
     }
 }
