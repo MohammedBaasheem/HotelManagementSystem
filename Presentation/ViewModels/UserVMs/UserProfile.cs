@@ -10,6 +10,7 @@ namespace Presentation.ViewModels.UserVMs
             CreateMap<UserDto, UserVM>();
             CreateMap<UserWithRolesDto, UserWithRolesVM>();
             CreateMap<UpdateUserVM, UpdateUserDto>();
+            CreateMap<AssignRoleVM, AssignRoleDto>();
 
         }
     }

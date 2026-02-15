@@ -45,10 +45,6 @@ namespace Application.Services
             {
                 return ResponseDto<bool>.Fail(ErrorCode.ValidationError, "Validation Error", errors);
             }
-            var Exist = await _UserRepo.IsExistAsync(u => u.Email == RequestDTO.Email.ToLower());
-
-            if (Exist)
-                return ResponseDto<bool>.Fail(ErrorCode.EmailAlreadyExists, "Email Already Exist");
 
             var user = _mapper.Map<User>(RequestDTO);
             user.PasswordHash = PasswordHasher.HashPassword(RequestDTO.Password);
@@ -76,6 +72,7 @@ namespace Application.Services
             {
                 return ResponseDto<LoginResponseDto>.Fail(ErrorCode.ValidationError, "Validation Error", errors);
             }
+
             var user = await _UserRepo.GetAll().Where(u => u.Email == RequestDTO.Email.ToLower())
                 .ProjectTo<UserWithRolesDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
@@ -123,24 +120,18 @@ namespace Application.Services
             return tokenString;
         }
 
-        public async Task<ResponseDto<bool>> AssignRoleToUserAsync (Guid userId, Guid roleId, Guid actionBy)
+        public async Task<ResponseDto<bool>> AssignRoleToUserAsync (AssignRoleDto RequestDTO, Guid actionBy)
         {
-            var userExist = await _UserRepo.IsExistAsync(x => x.Id == userId);
-            if(!userExist)
-                return ResponseDto<bool>.Fail(ErrorCode.UserNotFound, "User Not Found");
-
-            var roleExist = await _RoleRepo.IsExistAsync (x => x.Id == roleId);
-            if(!roleExist)
-                return ResponseDto<bool>.Fail(ErrorCode.RoleNotFound, "Role Not Found");
-
-            var roleUserExist = await _UserRepo.IsUserInRoleAsync(userId, roleId);
-            if(roleUserExist)
-                return ResponseDto<bool>.Fail(ErrorCode.DuplicateEntry, "User already has this role");
+            var errors = await _ValidationService.ValidateAsync(RequestDTO);
+            if (errors.Any())
+            {
+                return ResponseDto<bool>.Fail(ErrorCode.ValidationError, "Validation Error", errors);
+            }
 
             var userRole = new UserRole
             {
-                UserId = userId,
-                RoleId = roleId,
+                UserId = RequestDTO.UserId,
+                RoleId = RequestDTO.RoleId,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = actionBy
             };
